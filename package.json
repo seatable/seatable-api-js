@@ -1,9 +1,9 @@
 {
   "name": "seatable-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A tool library for accessing seatable base, providing interface services for third-party developers",
   "files": [
-    "dist",
+    "lib",
     "package.json",
     "package-lock.json"
   ],
