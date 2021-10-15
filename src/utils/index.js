@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const getAccessToken = () => {
+const getAccessToken = (config) => {
   const { server, APIToken } = config;
   const url = server + '/api/v2.1/dtable/app-access-token/';
   const headers = { 'Authorization': 'Token ' + APIToken };

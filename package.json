@@ -1,6 +1,6 @@
 {
   "name": "seatable-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A tool library for accessing seatable base, providing interface services for third-party developers",
   "files": [
     "lib",
@@ -9,7 +9,7 @@
   ],
   "main": "./lib/index.js",
   "scripts": {
-    "clean": "rm -rf dist && mkdir dist",
+    "clean": "rm -rf lib && mkdir lib",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/babel src --out-dir lib",
     "prepublishOnly": "npm run clean && npm run build"
