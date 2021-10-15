@@ -1,0 +1,35 @@
+{
+  "name": "seatable-api",
+  "version": "1.0.0",
+  "description": "A tool library for accessing seatable base, providing interface services for third-party developers",
+  "files": [
+    "dist",
+    "package.json",
+    "package-lock.json"
+  ],
+  "main": "./lib/index.js",
+  "scripts": {
+    "clean": "rm -rf dist && mkdir dist",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/babel src --out-dir lib",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seatable/seatable-api.git"
+  },
+  "author": "seafile",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seatable/seatable-api/issues"
+  },
+  "homepage": "https://github.com/seatable/seatable-api#readme",
+  "dependencies": {
+    "axios": "0.23.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.15.7",
+    "@babel/core": "7.15.8",
+    "@babel/preset-env": "7.15.8"
+  }
+}
