@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/seatable/seatable-api.git"
+    "url": "git+https://github.com/seatable/seatable-api-js.git"
   },
   "author": "seafile",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/seatable/seatable-api/issues"
+    "url": "https://github.com/seatable/seatable-api-js/issues"
   },
-  "homepage": "https://github.com/seatable/seatable-api#readme",
+  "homepage": "https://github.com/seatable/seatable-api-js#readme",
   "dependencies": {
     "axios": "0.23.0"
   },
