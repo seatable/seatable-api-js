@@ -41,7 +41,7 @@ class SeatableAPI {
     const params = {
       table_name: encodeURIComponent(tableName),
     }
-    return this.req.get(url, params);
+    return this.req.get(url, {params});
   }
 
   listColumns(tableName, viewName) {
