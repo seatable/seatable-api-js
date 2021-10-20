@@ -52,17 +52,17 @@ class Base {
     })
   }
 
-  get_dtable() {
+  getDTable() {
     const url = `dtables/${this.dtableUuid}/?lang=${this.lang}`;
     return this.req.get(url);
   }
 
-  get_metadata() {
+  getMetadata() {
     const url = `/api/v1/dtables/${this.dtableUuid}/metadata/`;
     return this.req.get(url);
   }
   
-  add_table(table_name, lang) {
+  addTable(table_name, lang) {
     const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
     const data = {
       table_name: table_name,
@@ -71,7 +71,7 @@ class Base {
     return this.req.post(url, {...data});
   }
 
-  list_views(table_name) {
+  listViews(table_name) {
     const url = `api/v1/dtables/${this.dtableUuid}/views/`;
     const params = {
       table_name: table_name,
@@ -79,7 +79,7 @@ class Base {
     return this.req.get(url, {params});
   }
 
-  list_columns(table_name, view_name) {
+  listColumns(table_name, view_name) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const params = {
       table_name: table_name,
@@ -88,7 +88,7 @@ class Base {
     return this.req.get(url, {params});
   }
 
-  insert_column(table_name, column_name, column_type, column_key, column_data) {
+  insertColumn(table_name, column_name, column_type, column_key, column_data) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
       table_name: table_name,
@@ -100,7 +100,7 @@ class Base {
     return this.req.post(url, {...data});
   }
   
-  rename_column(table_name, column_key, new_column_name) {
+  renameColumn(table_name, column_key, new_column_name) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
       op_type: 'rename_column',
@@ -111,7 +111,7 @@ class Base {
     return this.req.put(url, {...data});
   }
   
-  resize_column(table_name, column_key, new_column_width) {
+  resizeColumn(table_name, column_key, new_column_width) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
       op_type: 'resize_column',
@@ -122,7 +122,7 @@ class Base {
     return this.req.put(url, {...data});
   }
   
-  freeze_column(table_name, column_key, frozen) {
+  freezeColumn(table_name, column_key, frozen) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
       op_type: 'freeze_column',
@@ -133,7 +133,7 @@ class Base {
     return this.req.put(url, {...data});
   }
   
-  move_column(table_name, column_key, target_column_key) {
+  moveColumn(table_name, column_key, target_column_key) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
       op_type: 'move_column',
@@ -144,7 +144,7 @@ class Base {
     return this.req.put(url, {...data});
   }
   
-  modify_column_type(table_name, column_key, new_column_type) {
+  modifyColumnType(table_name, column_key, new_column_type) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
       op_type: 'modify_column_type',
@@ -155,7 +155,7 @@ class Base {
     return this.req.put(url, {...data});
   }
   
-  delete_column(table_name, column_key) {
+  deleteColumn(table_name, column_key) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
       table_name: table_name,
@@ -164,7 +164,7 @@ class Base {
     return this.req.delete(url, {data: data});
   }
   
-  add_column_options(table_name, column, options) {
+  addColumnOptions(table_name, column, options) {
     const url = `api/v1/dtables/${this.dtableUuid}/column-options/`;
     const data = {
       table_name: table_name,
@@ -174,7 +174,7 @@ class Base {
     return this.req.post(url, {...data});
   }
   
-  add_column_cascade_settings(table_name, child_column, parent_column, cascade_settings) {
+  addColumnCascadeSettings(table_name, child_column, parent_column, cascade_settings) {
     const url = `api/v1/dtables/${this.dtableUuid}/column-cascade-settings/`;
     const data = {
       table_name: table_name,
@@ -185,7 +185,7 @@ class Base {
     return this.req.post(url, {...data});
   }
 
-  list_rows(tableName, viewName) {
+  listRows(tableName, viewName) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
     const params = {
       table_name: tableName,
@@ -195,7 +195,7 @@ class Base {
     return this.req.get(url, {params});
   }
 
-  insert_row(table_name, row_data, anchor_row_id) {
+  appendRow(table_name, row_data) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
     const data = {
       table_name: table_name,
@@ -205,7 +205,17 @@ class Base {
     return this.req.post(url, {...data});
   }
 
-  delete_row(table_name, row_id) {
+  insertRow(table_name, row_data, anchor_row_id) {
+    const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
+    const data = {
+      table_name: table_name,
+      row: row_data,
+      anchor_row_id: anchor_row_id,
+    };
+    return this.req.post(url, {...data});
+  }
+
+  deleteRow(table_name, row_id) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
     const data = {
       table_name: table_name,
@@ -214,7 +224,7 @@ class Base {
     return this.req.delete(url, {data: data});
   }
 
-  update_row(table_name, row_id, row_data) {
+  updateRow(table_name, row_id, row_data) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
     const data = {
       table_name: table_name,
@@ -224,7 +234,7 @@ class Base {
     return this.req.put(url, {...data});
   }
 
-  get_row(table_name, row_id) {
+  getRow(table_name, row_id) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/${row_id}/`;
     const params = {
       table_name: table_name,
@@ -232,7 +242,7 @@ class Base {
     return this.req.get(url, {params});
   }
 
-  batch_append_rows(table_name, rows_data) {
+  batchAppendRows(table_name, rows_data) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-append-rows/`;
     const data = {
       table_name: table_name,
@@ -241,7 +251,7 @@ class Base {
     return this.req.post(url, {...data});
   }
   
-  batch_delete_rows(table_name, row_ids) {
+  batchDeleteRows(table_name, row_ids) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-delete-rows/`;
     const data = {
       table_name: table_name,
@@ -250,7 +260,7 @@ class Base {
     return this.req.delete(url, {data: data});
   }
   
-  batch_update_rows(table_name, rows_data) {
+  batchUpdateRows(table_name, rows_data) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-update-rows/`;
     const data = {
       table_name: table_name,
@@ -259,7 +269,7 @@ class Base {
     return this.req.put(url, {...data});
   }
   
-  add_link(link_id, table_name, other_table_name, row_id, other_row_id) {
+  addLink(link_id, table_name, other_table_name, row_id, other_row_id) {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
       link_id: link_id,
@@ -271,7 +281,7 @@ class Base {
     return this.req.post(url, {...data});
   }
   
-  update_link(link_id, table_id, other_table_id, row_id, other_rows_ids) {
+  updateLink(link_id, table_id, other_table_id, row_id, other_rows_ids) {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
       link_id: link_id,
@@ -283,7 +293,7 @@ class Base {
     return this.req.put(url, {...data});
   }
   
-  remove_link(link_id, table_name, other_table_name, row_id, other_row_id) {
+  removeLink(link_id, table_name, other_table_name, row_id, other_row_id) {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
       link_id: link_id,
@@ -295,7 +305,7 @@ class Base {
     return this.req.delete(url, {data: data});
   }
   
-  batch_update_links(link_id, table_id, other_table_id, row_id_list, other_rows_ids_map) {
+  batchUpdateLinks(link_id, table_id, other_table_id, row_id_list, other_rows_ids_map) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-update-links/`;
     const data = {
       link_id: link_id,
@@ -307,7 +317,7 @@ class Base {
     return this.req.put(url, {...data});
   }
 
-  get_column_link_id(columns, column_name) {
+  getColumnLinkId(columns, column_name) {
     const column = columns.find(column => column.name === column_name);
     if (!column) {
       return Promise.resolve({
