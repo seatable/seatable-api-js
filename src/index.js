@@ -52,7 +52,7 @@ class Base {
     })
   }
 
-  getDTable() {
+  get_dtable() {
     const url = `dtables/${this.dtableUuid}/?lang=${this.lang}`;
     return this.req.get(url);
   }
