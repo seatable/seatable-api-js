@@ -1,6 +1,6 @@
 {
   "name": "seatable-api",
-  "version": "1.0.3",
+  "version": "1.0.19",
   "description": "A tool library for accessing seatable base, providing interface services for third-party developers",
   "files": [
     "lib",
@@ -10,7 +10,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "clean": "rm -rf lib && mkdir lib",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "./node_modules/.bin/babel src --out-dir lib",
     "prepublishOnly": "npm run clean && npm run build"
   },
@@ -31,6 +31,7 @@
     "@babel/cli": "7.15.7",
     "@babel/core": "7.15.8",
     "@babel/preset-env": "7.15.8",
-    "eslint": "8.0.1"
+    "eslint": "8.0.1",
+    "jest": "27.2.5"
   }
 }
