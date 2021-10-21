@@ -25,10 +25,11 @@ class Base {
       baseURL: this.dtableServer,
       headers: {Authorization: 'Token ' + this.accessToken}
     });
-    this.req.interceptors.response.use(res => {
+    this.req.interceptors.response.use(response => {
+      const result = this.getResult(response);
       return {
         code: 0,
-        result: res.data
+        result: result
       }
     }, error => {
       let error_message = 'Network error.';
@@ -50,6 +51,46 @@ class Base {
         }
       };
     })
+  }
+
+  getResult(response) {
+    const { data, config } = response;
+    const { method, url } = config;
+    const paths = url.split('/');
+    const lastPath = paths[paths.length - 2];
+    let result = data;
+    if (method === 'get') {
+      // metadata
+      if (lastPath === 'metadata') {
+        result = data.metadata;
+        return result;
+      }
+
+      // list views
+      if (lastPath === 'views') {
+        result = data.views;
+        return result;
+      }
+
+      // list rows
+      if (url.indexOf('rows') > -1 && lastPath === 'rows') {
+        result = data.rows;
+        return result;
+      }
+
+      // list columns
+      if (lastPath === 'columns' > -1) {
+        result = data.columns;
+        return result;
+      }      
+    }
+
+    if (method === 'post' && lastPath === 'query') {
+      result = data.results;
+      return result;
+    }
+
+    return result;
   }
 
   getDTable() {
@@ -323,7 +364,7 @@ class Base {
       return Promise.resolve({
         code: 1,
         result: {
-          error_type: 'column is not exist',
+          error_message: 'column is not exist',
         }
       });
     }
@@ -339,9 +380,7 @@ class Base {
 
     return Promise.resolve({
       code: 0,
-      result: {
-        link_id: column.data['link_id']
-      }
+      result: column.data['link_id']
     });
   }
 
