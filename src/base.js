@@ -206,13 +206,25 @@ class Base {
     return this.req.post(url, {...data});
   }
 
-  listRows(tableName, viewName) {
+  listRows(table_name, view_name, order_by, desc, start, limit) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
     const params = {
-      table_name: tableName,
-      view_name: viewName,
+      table_name: table_name,
+      view_name: view_name,
       convert_link_id: true,
     };
+    params['direction'] = desc ? 'desc' : 'asc';
+    if (order_by) {
+      params['order_by'] = order_by;
+    }
+    if (start) {
+      params['start'] = start;
+    }
+
+    if (limit) {
+      params['limit'] = limit;
+    }
+
     return this.req.get(url, {params});
   }
 
