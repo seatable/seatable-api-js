@@ -1,7 +1,3 @@
 # SeatableAPI
 
-## Introduce
-
-A tool library for accessing seatable base, providing interface services for third-party developers
-
-## 
+A tool library for accessing SeaTable bases via SeaTable Restful API.
