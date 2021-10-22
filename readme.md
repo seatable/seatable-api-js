@@ -1,3 +1,3 @@
-# SeatableAPI
+# SeaTable API
 
-A tool library for accessing SeaTable bases via SeaTable Restful API.
+A library for accessing SeaTable bases via SeaTable Restful API.
