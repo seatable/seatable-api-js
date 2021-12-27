@@ -233,7 +233,6 @@ class Base {
     const data = {
       table_name: table_name,
       row: row_data,
-      anchor_row_id: anchor_row_id,
     };
     return this.req.post(url, {...data});
   }
