@@ -25,11 +25,13 @@
   },
   "homepage": "https://github.com/seatable/seatable-api-js#readme",
   "dependencies": {
+    "@babel/runtime": "7.20.13",
     "axios": "0.23.0"
   },
   "devDependencies": {
     "@babel/cli": "7.15.7",
     "@babel/core": "7.15.8",
+    "@babel/plugin-transform-runtime": "7.19.6",
     "@babel/preset-env": "7.15.8",
     "eslint": "8.0.1",
     "jest": "27.2.5"
