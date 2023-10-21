@@ -65,11 +65,6 @@ class Base {
       }      
     }
 
-    if (method === 'post' && lastPath === 'query') {
-      result = data.results;
-      return result;
-    }
-
     return result;
   }
 
@@ -365,8 +360,7 @@ class Base {
   query(sql) {
     const url = `api/v1/dtables/${this.dtableUuid}/query/`;
     const data = {sql: sql};
-    return this.req.post(url, {...data}).then(res => {
-      const result = res.data;
+    return this.req.post(url, {...data}).then(result => {
       return Promise.resolve(formatQueryResult(result));
     });
   }

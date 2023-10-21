@@ -10,8 +10,8 @@ const getAccessToken = (config) => {
 };
 
 const formatQueryResult = (result) => {
-  const { meta_data, results } = result;
-  const columnMap = meta_data.map(column => {
+  const { metadata: columns, results: rows } = result;
+  const columnMap = columns.reduce((keyMap, column) => {
     if (column.type === ColumnTypes.SINGLE_SELECT || column.type === ColumnTypes.MULTIPLE_SELECT) {
       const { options = [] } = column.data || {};
       let options_map = {};
@@ -20,14 +20,15 @@ const formatQueryResult = (result) => {
       });
       column.options_map = options_map;
     }
-    return { [column.key]: column };
-  });
+    keyMap[column.key] = column;
+    return keyMap;
+  }, {});
 
-  let rows = [];
-  for (let i = 0; i < results.length; i++) {
-    const row = results[i];
-    const newRow = {};
-    newRow['_id'] = row._id;
+  let formatRows = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const formatRow = {};
+    formatRow['_id'] = row._id;
     Object.keys(row).forEach(key => {
       if (columnMap[key]) {
         const { name, type, options_map, data = {} } = columnMap[key];
@@ -63,12 +64,12 @@ const formatQueryResult = (result) => {
             break;
           }
         }
-        newRow[name] = cellValue;
+        formatRow[name] = cellValue;
       }
     });
-    rows.push(newRow);
+    formatRows.push(formatRow);
   }
-  return rows;
+  return formatRows;
 }
 
 export {
