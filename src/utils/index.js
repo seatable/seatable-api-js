@@ -46,7 +46,7 @@ const formatQueryResult = (result) => {
           case ColumnTypes.LINK:
           case ColumnTypes.LINK_FORMULA: {
             if (!Array.isArray(cellValue)) {
-              cellValue = cellValue && cellValue.display_value;
+              cellValue = [];
             } else {
               cellValue = cellValue.map(item => item.display_value);
             }
