@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getAccessToken } from './utils';
+import { formatQueryResult, getAccessToken } from './utils';
 
 class Base {
 
@@ -365,7 +365,10 @@ class Base {
   query(sql) {
     const url = `api/v1/dtables/${this.dtableUuid}/query/`;
     const data = {sql: sql};
-    return this.req.post(url, {...data});
+    return this.req.post(url, {...data}).then(res => {
+      const result = res.data;
+      return Promise.resolve(formatQueryResult(result));
+    });
   }
   
 }
