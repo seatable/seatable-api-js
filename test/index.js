@@ -7,11 +7,11 @@ const config = {
 };
 
 
-async function aa() {
+async function testAPI() {
   const base = new Base(config);
   await base.auth();
   const data = await base.query('select * from Table1');
   fs.writeFileSync('./abc.json', JSON.stringify(data, null, 2))
 }
 
-aa();
+testAPI();
