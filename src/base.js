@@ -9,18 +9,20 @@ class Base {
     this.accessToken = '';
     this.dtableServer = '';
     this.dtableSocket = '';
+    this.dtableDB = '';
     this.lang = 'en';
     this.req = null;
   }
 
   async auth() {
     const response = await getAccessToken(this.config);
-    const { app_name, access_token, dtable_uuid, dtable_server, dtable_socket } = response.data;
+    const { app_name, access_token, dtable_uuid, dtable_server, dtable_socket, dtable_db } = response.data;
     this.appName = app_name;
     this.accessToken = access_token;
     this.dtableServer = dtable_server;
     this.dtableSocket = dtable_socket;
     this.dtableUuid = dtable_uuid;
+    this.dtableDB = dtable_db;
     this.req = axios.create({
       baseURL: this.dtableServer,
       headers: {Authorization: 'Token ' + this.accessToken}
@@ -358,10 +360,14 @@ class Base {
   }
 
   query(sql) {
-    const url = `api/v1/dtables/${this.dtableUuid}/query/`;
+    const url = `api/v1/query/${this.dtableUuid}/`;
     const data = {sql: sql};
-    return this.req.post(url, {...data}).then(result => {
-      return Promise.resolve(formatQueryResult(result));
+    const req = axios.create({
+      baseURL: this.dtableDB,
+      headers: {Authorization: 'Token ' + this.accessToken}
+    });
+    return req.post(url, {...data}).then(response => {
+      return Promise.resolve(formatQueryResult(response.data));
     });
   }
   
