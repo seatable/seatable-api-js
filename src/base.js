@@ -360,7 +360,7 @@ class Base {
   }
 
   query(sql) {
-    const url = `api/v1/query/${this.dtableUuid}/?from=javascript_api`;
+    const url = `api/v1/query/${this.dtableUuid}/`;
     const data = {sql: sql};
     const req = axios.create({
       baseURL: this.dtableDB,
