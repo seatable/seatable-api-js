@@ -9,16 +9,30 @@ const getAccessToken = (config) => {
   return axios.get(url, { headers: headers });
 };
 
+const isSingleOrMultiple = (type) => {
+  return type === ColumnTypes.SINGLE_SELECT || type === ColumnTypes.MULTIPLE_SELECT;
+}
+
+const formatColumnOptionsToMap = (column) => {
+  const { options = [] } = column.data || {};
+  let options_map = {};
+  options.forEach(option => {
+    options_map[option.id] = option.name;
+  });
+  return options_map;
+};
+
 const formatQueryResult = (result) => {
   const { metadata: columns, results: rows } = result;
   const columnMap = columns.reduce((keyMap, column) => {
-    if (column.type === ColumnTypes.SINGLE_SELECT || column.type === ColumnTypes.MULTIPLE_SELECT) {
-      const { options = [] } = column.data || {};
-      let options_map = {};
-      options.forEach(option => {
-        options_map[option.id] = option.name;
-      });
-      column.options_map = options_map;
+    if (isSingleOrMultiple(column.type)) {
+      column.options_map = formatColumnOptionsToMap(column);
+    }
+    if (column.type === ColumnTypes.LINK || column.type === ColumnTypes.LINK_FORMULA) {
+      const { array_type, array_data } = column.data;
+      if (isSingleOrMultiple(array_type)) {
+        column.options_map = formatColumnOptionsToMap({ data: array_data });
+      }
     }
     keyMap[column.key] = column;
     return keyMap;
@@ -47,8 +61,13 @@ const formatQueryResult = (result) => {
           case ColumnTypes.LINK_FORMULA: {
             if (!Array.isArray(cellValue)) {
               cellValue = [];
-            } else {
+              break;
+            }
+            const { array_type } = data;
+            if (!isSingleOrMultiple(array_type)) {
               cellValue = cellValue.map(item => item.display_value);
+            } else {
+              cellValue = cellValue.map(item => options_map[item.display_value]);
             }
             break;
           }
