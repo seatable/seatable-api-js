@@ -1,6 +1,6 @@
 {
   "name": "seatable-api",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "A tool library for accessing seatable base, providing interface services for third-party developers",
   "files": [
     "lib",
