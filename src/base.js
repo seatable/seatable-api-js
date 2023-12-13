@@ -64,7 +64,7 @@ class Base {
       if (lastPath === 'columns') {
         result = data.columns;
         return result;
-      }      
+      }
     }
 
     return result;
@@ -79,7 +79,7 @@ class Base {
     const url = `/api/v1/dtables/${this.dtableUuid}/metadata/`;
     return this.req.get(url);
   }
-  
+
   addTable(table_name, lang) {
     const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
     const data = {
@@ -117,7 +117,7 @@ class Base {
     };
     return this.req.post(url, {...data});
   }
-  
+
   renameColumn(table_name, column_key, new_column_name) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
@@ -128,7 +128,7 @@ class Base {
     };
     return this.req.put(url, {...data});
   }
-  
+
   resizeColumn(table_name, column_key, new_column_width) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
@@ -139,7 +139,7 @@ class Base {
     };
     return this.req.put(url, {...data});
   }
-  
+
   freezeColumn(table_name, column_key, frozen) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
@@ -150,7 +150,7 @@ class Base {
     };
     return this.req.put(url, {...data});
   }
-  
+
   moveColumn(table_name, column_key, target_column_key) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
@@ -161,7 +161,7 @@ class Base {
     };
     return this.req.put(url, {...data});
   }
-  
+
   modifyColumnType(table_name, column_key, new_column_type) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
@@ -172,7 +172,7 @@ class Base {
     };
     return this.req.put(url, {...data});
   }
-  
+
   deleteColumn(table_name, column_key) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const data = {
@@ -181,7 +181,7 @@ class Base {
     };
     return this.req.delete(url, {data: data});
   }
-  
+
   addColumnOptions(table_name, column, options) {
     const url = `api/v1/dtables/${this.dtableUuid}/column-options/`;
     const data = {
@@ -191,7 +191,7 @@ class Base {
     };
     return this.req.post(url, {...data});
   }
-  
+
   addColumnCascadeSettings(table_name, child_column, parent_column, cascade_settings) {
     const url = `api/v1/dtables/${this.dtableUuid}/column-cascade-settings/`;
     const data = {
@@ -279,7 +279,7 @@ class Base {
     };
     return this.req.post(url, {...data});
   }
-  
+
   batchDeleteRows(table_name, row_ids) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-delete-rows/`;
     const data = {
@@ -288,7 +288,7 @@ class Base {
     };
     return this.req.delete(url, {data: data});
   }
-  
+
   batchUpdateRows(table_name, rows_data) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-update-rows/`;
     const data = {
@@ -297,7 +297,7 @@ class Base {
     };
     return this.req.put(url, {...data});
   }
-  
+
   addLink(link_id, table_name, other_table_name, row_id, other_row_id) {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
@@ -309,7 +309,7 @@ class Base {
     };
     return this.req.post(url, {...data});
   }
-  
+
   updateLink(link_id, table_id, other_table_id, row_id, other_rows_ids) {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
@@ -321,7 +321,7 @@ class Base {
     };
     return this.req.put(url, {...data});
   }
-  
+
   removeLink(link_id, table_name, other_table_name, row_id, other_row_id) {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
@@ -333,7 +333,7 @@ class Base {
     };
     return this.req.delete(url, {data: data});
   }
-  
+
   batchUpdateLinks(link_id, table_id, other_table_id, row_id_list, other_rows_ids_map) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-update-links/`;
     const data = {
@@ -359,6 +359,22 @@ class Base {
     return Promise.resolve(column.data['link_id']);
   }
 
+  getLinkedRecords(table_id, link_column_key, rows) {
+    const url = `api/v1/linked-records/${this.dtableUuid}/`;
+    const data = {
+      link_column: link_column_key,
+      table_id,
+      rows,
+    };
+    const req = axios.create({
+      baseURL: this.dtableDB,
+      headers: {Authorization: 'Token ' + this.accessToken}
+    });
+    return req.post(url, {...data}).then((response) => {
+      return Promise.resolve((response && response.data) || {});
+    });
+  }
+
   query(sql) {
     const url = `api/v1/query/${this.dtableUuid}/`;
     const data = {sql: sql};
@@ -370,7 +386,7 @@ class Base {
       return Promise.resolve(formatQueryResult(response.data));
     });
   }
-  
+
 }
 
 export default Base;
