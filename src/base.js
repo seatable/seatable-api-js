@@ -75,6 +75,17 @@ class Base {
     return this.req.get(url);
   }
 
+  async getTables() {
+    const res = await this.getDTable();
+    return res.tables;
+  }
+
+  async getTableByName(table_name) {
+    const res = await this.getTables();
+    return res.find(table=> table.name === table_name);
+
+  }
+
   getMetadata() {
     const url = `/api/v1/dtables/${this.dtableUuid}/metadata/`;
     return this.req.get(url);
@@ -87,6 +98,24 @@ class Base {
       lang: lang
     }
     return this.req.post(url, {...data});
+  }
+
+  renameTable(old_name, new_name) {
+    const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
+    const data = {
+      table_name: old_name,
+      new_table_name: new_name
+    }
+    return this.req.put(url, {...data});
+  }
+
+  deleteTable(table_name) {
+    const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
+    const data = {
+      table_name: table_name,
+    }
+    return this.req.delete(url, {data:data});
+
   }
 
   listViews(table_name) {
