@@ -71,7 +71,7 @@ class Base {
   }
 
   getDTable() {
-    const url = `dtables/${this.dtableUuid}/?lang=${this.lang}`;
+    const url = `/dtables/${this.dtableUuid}/?lang=${this.lang}`;
     return this.req.get(url);
   }
 
@@ -90,6 +90,7 @@ class Base {
     const url = `/api/v1/dtables/${this.dtableUuid}/metadata/`;
     return this.req.get(url);
   }
+
 
   addTable(table_name, lang) {
     const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
@@ -383,8 +384,8 @@ class Base {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
       link_id: link_id,
-      table_id: table_id,
-      other_table_id: other_table_id,
+      table_name: table_id,
+      other_table_name: other_table_id,
       row_id: row_id,
       other_rows_ids: other_rows_ids,
     };
@@ -415,7 +416,8 @@ class Base {
     return this.req.put(url, {...data});
   }
 
-  getColumnLinkId(columns, column_name) {
+  async getColumnLinkId(table_name, column_name) {
+    const columns = await this.listColumns(table_name);
     const column = columns.find(column => column.name === column_name);
     if (!column) {
       return Promise.reject({error_message: 'column is not exist',});
