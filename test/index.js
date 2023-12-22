@@ -2,17 +2,17 @@ const fs = require('fs')
 const { Base } = require('../lib');
 
 const config = {
-  server: 'https://dev.seatable.cn',
-  APIToken: 'e16880c58426d59d698143f1dfb8abc8bd5d2ecc'
+  server: 'http://127.0.0.1',
+  APIToken: 'acdf4e21d4a0f36686848d81523a2df4ab67bf2d'
 };
 
 
 async function testAPI() {
   const base = new Base(config);
   await base.auth();
-  const data = await base.deleteTable('Sheet1');
-  console.log(data, 'ssssssss')
-  // fs.writeFileSync('./abc.json', JSON.stringify(data, null, 2))
+  const data = await base.query('select * from Table2');
+  fs.writeFileSync('./abc.json', JSON.stringify(data, null, 2))
 }
 
 testAPI();
+
