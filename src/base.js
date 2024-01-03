@@ -77,7 +77,7 @@ class Base {
 
   async getTables() {
     const res = await this.getDTable();
-    return res.tables;
+    return res ? res.tables : [];
   }
 
   async getTableByName(table_name) {
@@ -90,7 +90,6 @@ class Base {
     const url = `/api/v1/dtables/${this.dtableUuid}/metadata/`;
     return this.req.get(url);
   }
-
 
   addTable(table_name, lang) {
     const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
