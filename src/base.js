@@ -76,7 +76,7 @@ class Base {
   }
 
   async getTables() {
-    const res = await this.getDTable();
+    const res = await this.getMetadata();
     return res ? res.tables : [];
   }
 
