@@ -83,7 +83,6 @@ class Base {
   async getTableByName(table_name) {
     const res = await this.getTables();
     return res.find(table=> table.name === table_name);
-
   }
 
   getMetadata() {
@@ -166,13 +165,11 @@ class Base {
   async getColumnByName(table_name, column_name) {
     const res = await this.listColumns(table_name);
     return res.find(col=> col.name === column_name);
-
   }
 
   async getColumnsByType(table_name, column_type) {
     const res = await this.listColumns(table_name);
     return res.filter(col=> col.type === column_type);
-
   }
 
   insertColumn(table_name, column_name, column_type, column_key, column_data) {
