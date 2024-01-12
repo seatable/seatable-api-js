@@ -71,8 +71,18 @@ class Base {
   }
 
   getDTable() {
-    const url = `dtables/${this.dtableUuid}/?lang=${this.lang}`;
+    const url = `/dtables/${this.dtableUuid}/?lang=${this.lang}`;
     return this.req.get(url);
+  }
+
+  async getTables() {
+    const res = await this.getMetadata();
+    return res ? res.tables : [];
+  }
+
+  async getTableByName(table_name) {
+    const res = await this.getTables();
+    return res.find(table=> table.name === table_name);
   }
 
   getMetadata() {
@@ -89,12 +99,58 @@ class Base {
     return this.req.post(url, {...data});
   }
 
+  renameTable(old_name, new_name) {
+    const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
+    const data = {
+      table_name: old_name,
+      new_table_name: new_name
+    }
+    return this.req.put(url, {...data});
+  }
+
+  deleteTable(table_name) {
+    const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
+    const data = {
+      table_name: table_name,
+    }
+    return this.req.delete(url, {data:data});
+
+  }
+
   listViews(table_name) {
     const url = `api/v1/dtables/${this.dtableUuid}/views/`;
     const params = {
       table_name: table_name,
     }
     return this.req.get(url, {params});
+  }
+
+  getViewByName(table_name, view_name) {
+    const url = `api/v1/dtables/${this.dtableUuid}/views/${view_name}/?table_name=` + table_name;
+    return this.req.get(url)
+  }
+
+  addView(table_name, view_name) {
+    const url = `api/v1/dtables/${this.dtableUuid}/views/?table_name=` + table_name;
+    const data = {
+      name: view_name
+    };
+    return this.req.post(url, {...data});
+  }
+
+  renameView(table_name, view_name, new_view_name) {
+    const url = `api/v1/dtables/${this.dtableUuid}/views/${view_name}/?table_name=` + table_name;
+    const data = {
+      name: new_view_name,
+    }
+    return this.req.put(url, {...data});
+
+  }
+
+  deleteView(table_name, view_name) {
+    const url = `api/v1/dtables/${this.dtableUuid}/views/${view_name}/?table_name=` + table_name;
+    return this.req.delete(url);
+
   }
 
   listColumns(table_name, view_name) {
@@ -104,6 +160,16 @@ class Base {
       view_name: view_name
     }
     return this.req.get(url, {params});
+  }
+
+  async getColumnByName(table_name, column_name) {
+    const res = await this.listColumns(table_name);
+    return res.find(col=> col.name === column_name);
+  }
+
+  async getColumnsByType(table_name, column_type) {
+    const res = await this.listColumns(table_name);
+    return res.filter(col=> col.type === column_type);
   }
 
   insertColumn(table_name, column_name, column_type, column_key, column_data) {
@@ -314,8 +380,8 @@ class Base {
     const url = `api/v1/dtables/${this.dtableUuid}/links/`;
     const data = {
       link_id: link_id,
-      table_id: table_id,
-      other_table_id: other_table_id,
+      table_name: table_id,
+      other_table_name: other_table_id,
       row_id: row_id,
       other_rows_ids: other_rows_ids,
     };
@@ -346,7 +412,8 @@ class Base {
     return this.req.put(url, {...data});
   }
 
-  getColumnLinkId(columns, column_name) {
+  async getColumnLinkId(table_name, column_name) {
+    const columns = await this.listColumns(table_name);
     const column = columns.find(column => column.name === column_name);
     if (!column) {
       return Promise.reject({error_message: 'column is not exist',});
