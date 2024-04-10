@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios from 'axios';
+import APIGateway from './api-gateway';
 import { formatQueryResult, getAccessToken } from './utils';
 
 class Base {
@@ -12,11 +13,15 @@ class Base {
     this.dtableDB = '';
     this.lang = 'en';
     this.req = null;
+    this.apiGateway = null;
   }
 
   async auth() {
     const response = await getAccessToken(this.config);
-    const { app_name, access_token, dtable_uuid, dtable_server, dtable_socket, dtable_db } = response.data;
+    const {
+      app_name, access_token, dtable_uuid, dtable_server, dtable_socket, dtable_db,
+      use_api_gateway = false,
+    } = response.data;
     this.appName = app_name;
     this.accessToken = access_token;
     this.dtableServer = dtable_server;
@@ -25,7 +30,7 @@ class Base {
     this.dtableDB = dtable_db;
     this.req = axios.create({
       baseURL: this.dtableServer,
-      headers: {Authorization: 'Token ' + this.accessToken}
+      headers: { Authorization: 'Token ' + this.accessToken }
     });
     this.req.interceptors.response.use(response => {
       const result = this.getResult(response);
@@ -33,6 +38,60 @@ class Base {
     }, error => {
       return Promise.reject(error);
     });
+
+    // api gateway entry
+    if (use_api_gateway) {
+      this.apiGateway = new APIGateway({
+        token: access_token,
+        server: this.config.server,
+        dtable_uuid,
+      });
+      this.useApiGatewayWrapper();
+    }
+  }
+
+  useApiGatewayWrapper() {
+    [
+      // dtable
+      this.getDTable, this.getMetadata,
+
+      // table
+      this.addTable, this.renameTable, this.deleteTable,
+
+      // view
+      this.listViews, this.getViewByName, this.addView, this.renameView, this.deleteView,
+
+      // column
+      this.listColumns, this.insertColumn, this.renameColumn, this.resizeColumn, this.freezeColumn,
+      this.moveColumn, this.modifyColumnType, this.addColumnOptions, this.addColumnCascadeSettings,
+      this.deleteColumn,
+
+      // row
+      this.listRows, this.getRow, this.appendRow, this.batchAppendRows, this.insertRow,
+      this.updateRow, this.batchUpdateRows, this.deleteRow, this.batchDeleteRows,
+
+      // link
+      this.addLink, this.removeLink, this.updateLink, this.batchUpdateLinks, this.getLinkedRecords,
+
+      // query
+      this.query,
+    ].forEach((func) => {
+      if (func && Object.prototype.toString.call(func) === '[object Function]') {
+        const funcName = func.name;
+        this[funcName] = this.apiGatewayWrapper(func);
+      }
+    });
+  }
+
+  apiGatewayWrapper(func) {
+    return (...args) => {
+      const funcName = func.name;
+      const apiGatewayFunc = this.apiGateway && this.apiGateway[funcName];
+      if (apiGatewayFunc) {
+        return apiGatewayFunc.apply(this.apiGateway, args);
+      }
+      return func.apply(this, args);
+    }
   }
 
   getResult(response) {
@@ -75,28 +134,34 @@ class Base {
     return this.req.get(url);
   }
 
-  async getTables() {
-    const res = await this.getMetadata();
-    return res ? res.tables : [];
-  }
-
-  async getTableByName(table_name) {
-    const res = await this.getTables();
-    return res.find(table=> table.name === table_name);
-  }
-
   getMetadata() {
     const url = `/api/v1/dtables/${this.dtableUuid}/metadata/`;
     return this.req.get(url);
   }
 
-  addTable(table_name, lang) {
+  async getTables() {
+    const res = await this.getMetadata();
+    return (res && res.tables) || [];
+  }
+
+  async getTableByName(table_name) {
+    const tables = await this.getTables();
+    if (!Array.isArray(tables) || tables.length === 0) {
+      return {};
+    }
+    return tables.find(table=> table.name === table_name);
+  }
+
+  addTable(table_name, lang = 'en', columns = []) {
     const url = `/api/v1/dtables/${this.dtableUuid}/tables/`;
-    const data = {
+    let data = {
       table_name: table_name,
       lang: lang
     }
-    return this.req.post(url, {...data});
+    if (columns) {
+      data.columns = columns;
+    }
+    return this.req.post(url, data);
   }
 
   renameTable(old_name, new_name) {
@@ -144,22 +209,20 @@ class Base {
       name: new_view_name,
     }
     return this.req.put(url, {...data});
-
   }
 
   deleteView(table_name, view_name) {
     const url = `api/v1/dtables/${this.dtableUuid}/views/${view_name}/?table_name=` + table_name;
     return this.req.delete(url);
-
   }
 
   listColumns(table_name, view_name) {
     const url = `api/v1/dtables/${this.dtableUuid}/columns/`;
     const params = {
       table_name: table_name,
-      view_name: view_name
+      view_name: view_name,
     }
-    return this.req.get(url, {params});
+    return this.req.get(url, { params });
   }
 
   async getColumnByName(table_name, column_name) {
@@ -170,6 +233,20 @@ class Base {
   async getColumnsByType(table_name, column_type) {
     const res = await this.listColumns(table_name);
     return res.filter(col=> col.type === column_type);
+  }
+
+  async getColumnLinkId(table_name, column_name) {
+    const columns = await this.listColumns(table_name);
+    const column = columns.find(column => column.name === column_name);
+    if (!column) {
+      return Promise.reject({error_message: 'column is not exist',});
+    }
+
+    if (column.type !== 'link') {
+      return Promise.reject({error_message: `The column ${column_name} is not a link colum`});
+    }
+
+    return Promise.resolve(column.data['link_id']);
   }
 
   insertColumn(table_name, column_name, column_type, column_key, column_data) {
@@ -291,22 +368,28 @@ class Base {
     return this.req.get(url, {params});
   }
 
-  appendRow(table_name, row_data) {
+  appendRow(table_name, row_data, apply_default) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
-    const data = {
+    let data = {
       table_name: table_name,
       row: row_data,
     };
+    if (typeof apply_default === 'boolean') {
+      data.apply_default = apply_default;
+    }
     return this.req.post(url, {...data});
   }
 
-  insertRow(table_name, row_data, anchor_row_id) {
+  insertRow(table_name, row_data, anchor_row_id, apply_default) {
     const url = `api/v1/dtables/${this.dtableUuid}/rows/`;
-    const data = {
+    let data = {
       table_name: table_name,
       row: row_data,
       anchor_row_id: anchor_row_id,
     };
+    if (typeof apply_default === 'boolean') {
+      data.apply_default = apply_default;
+    }
     return this.req.post(url, {...data});
   }
 
@@ -337,12 +420,15 @@ class Base {
     return this.req.get(url, {params});
   }
 
-  batchAppendRows(table_name, rows_data) {
+  batchAppendRows(table_name, rows_data, apply_default) {
     const url = `api/v1/dtables/${this.dtableUuid}/batch-append-rows/`;
-    const data = {
+    let data = {
       table_name: table_name,
       rows: rows_data,
     };
+    if (typeof apply_default === 'boolean') {
+      data.apply_default = apply_default;
+    }
     return this.req.post(url, {...data});
   }
 
@@ -410,20 +496,6 @@ class Base {
       other_rows_ids_map: other_rows_ids_map,
     };
     return this.req.put(url, {...data});
-  }
-
-  async getColumnLinkId(table_name, column_name) {
-    const columns = await this.listColumns(table_name);
-    const column = columns.find(column => column.name === column_name);
-    if (!column) {
-      return Promise.reject({error_message: 'column is not exist',});
-    }
-
-    if (column.type !== 'link') {
-      return Promise.reject({error_message: `The column ${column_name} is not a link colum`});
-    }
-
-    return Promise.resolve(column.data['link_id']);
   }
 
   getLinkedRecords(table_id, link_column_key, rows) {
