@@ -19,7 +19,12 @@ class Base {
   async auth() {
     const response = await getAccessToken(this.config);
     const {
-      app_name, access_token, dtable_uuid, dtable_server, dtable_socket, dtable_db,
+      app_name,
+      access_token,
+      dtable_uuid,
+      dtable_server = '',
+      dtable_socket = '',
+      dtable_db = '',
       use_api_gateway = false,
     } = response.data;
     this.appName = app_name;
@@ -28,16 +33,6 @@ class Base {
     this.dtableSocket = dtable_socket;
     this.dtableUuid = dtable_uuid;
     this.dtableDB = dtable_db;
-    this.req = axios.create({
-      baseURL: this.dtableServer,
-      headers: { Authorization: 'Token ' + this.accessToken }
-    });
-    this.req.interceptors.response.use(response => {
-      const result = this.getResult(response);
-      return result;
-    }, error => {
-      return Promise.reject(error);
-    });
 
     // api gateway entry
     if (use_api_gateway) {
@@ -47,6 +42,23 @@ class Base {
         dtable_uuid,
       });
       this.useApiGatewayWrapper();
+    }
+
+    if (this.dtableServer) {
+      this.req = axios.create({
+        baseURL: this.dtableServer,
+        headers: { Authorization: 'Token ' + this.accessToken }
+      });
+      this.req.interceptors.response.use(response => {
+        const result = this.getResult(response);
+        return result;
+      }, error => {
+        return Promise.reject(error);
+      });
+    }
+
+    if (!use_api_gateway && !this.dtableServer) {
+      throw new Error('dtable_server is required when not using API Gateway.');
     }
   }
 
