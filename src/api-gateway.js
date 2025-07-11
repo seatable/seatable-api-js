@@ -7,6 +7,7 @@ class APIGateway {
     this.token = token;
     this.dtable_uuid = dtable_uuid;
     this.baseURL = server[server.length - 1] === '/' ? `${server}api-gateway` : `${server}/api-gateway`;
+    this.res_headers = null;
     this.init();
   }
 
@@ -17,9 +18,22 @@ class APIGateway {
     });
   }
 
+  setResponseHeaders(res_headers) {
+    this.res_headers = res_headers || null;
+  }
+
+  getResponseHeaders(key) {
+    if (!this.res_headers) return null;
+    if (key) {
+      return Object.hasOwnProperty.call(this.res_headers, key) ? this.res_headers[key] : null;
+    }
+    return this.res_headers;
+  }
+
   async getDTable() {
     const url = `/api/v2/dtables/${this.dtable_uuid}/`;
     const res = await this.req.get(url);
+    this.setResponseHeaders(res && res.headers);
     if (!res) {
       return {};
     }
@@ -29,6 +43,7 @@ class APIGateway {
   async getMetadata() {
     const url = `/api/v2/dtables/${this.dtable_uuid}/metadata/`;
     const res = await this.req.get(url);
+    this.setResponseHeaders(res && res.headers);
     if (!res || !res.data) {
       return {};
     }
@@ -45,6 +60,7 @@ class APIGateway {
       data.columns = columns;
     }
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -55,6 +71,7 @@ class APIGateway {
       new_table_name,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -64,6 +81,7 @@ class APIGateway {
       table_name,
     };
     const res = await this.req.delete(url, { data });
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -73,6 +91,7 @@ class APIGateway {
       table_name,
     };
     const res = await this.req.get(url, { params });
+    this.setResponseHeaders(res && res.headers);
     if (!res || !res.data) {
       return [];
     }
@@ -82,6 +101,7 @@ class APIGateway {
   async getViewByName(table_name, view_name) {
     const url = `/api/v2/dtables/${this.dtable_uuid}/views/${view_name}/?table_name=${table_name}`;
     const res = await this.req.get(url);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -91,6 +111,7 @@ class APIGateway {
       name: view_name,
     };
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -100,12 +121,14 @@ class APIGateway {
       name: new_view_name,
     }
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
   async deleteView(table_name, view_name) {
     const url = `/api/v2/dtables/${this.dtable_uuid}/views/${view_name}/?table_name=${table_name}`;
     const res = await this.req.delete(url);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -118,6 +141,7 @@ class APIGateway {
       params.view_name = view_name;
     }
     const res = await this.req.get(url, { params });
+    this.setResponseHeaders(res && res.headers);
     if (!res || !res.data) {
       return [];
     }
@@ -138,6 +162,7 @@ class APIGateway {
       data.column_data = column_data;
     }
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -150,6 +175,7 @@ class APIGateway {
       new_column_name,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -162,6 +188,7 @@ class APIGateway {
       new_column_width,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -174,6 +201,7 @@ class APIGateway {
       frozen,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -186,6 +214,7 @@ class APIGateway {
       table_name,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -198,6 +227,7 @@ class APIGateway {
       new_column_type,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -209,6 +239,7 @@ class APIGateway {
       options
     };
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -221,6 +252,7 @@ class APIGateway {
       cascade_settings,
     };
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -231,6 +263,7 @@ class APIGateway {
       column: column_key,
     };
     const res = await this.req.delete(url, { data });
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -256,6 +289,7 @@ class APIGateway {
     }
 
     const res = await this.req.get(url, { params });
+    this.setResponseHeaders(res && res.headers);
     if (!res || !res.data) {
       return [];
     }
@@ -269,6 +303,7 @@ class APIGateway {
       convert_keys: true,
     };
     const res = await this.req.get(url, { params });
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -282,6 +317,7 @@ class APIGateway {
       data.apply_default = apply_default;
     }
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     if (!res || !res.data) {
       return {};
     }
@@ -298,6 +334,7 @@ class APIGateway {
       data.apply_default = apply_default;
     }
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     if (!res || !res.data) {
       return {};
     }
@@ -319,6 +356,7 @@ class APIGateway {
       }]
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -329,6 +367,7 @@ class APIGateway {
       updates: rows_data,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -339,6 +378,7 @@ class APIGateway {
       row_ids: [row_id],
     };
     const res = await this.req.delete(url, { data });
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -349,6 +389,7 @@ class APIGateway {
       row_ids,
     };
     const res = await this.req.delete(url, { data });
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -363,6 +404,7 @@ class APIGateway {
       },
     };
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     return res && res.data;
   }
 
@@ -378,6 +420,7 @@ class APIGateway {
       },
     };
     const res = await this.req.delete(url, { data });
+    this.setResponseHeaders(res && res.headers);
     return res && res.data;
   }
 
@@ -392,6 +435,7 @@ class APIGateway {
       },
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return res && res.data;
   }
 
@@ -404,6 +448,7 @@ class APIGateway {
       other_rows_ids_map,
     };
     const res = await this.req.put(url, data);
+    this.setResponseHeaders(res && res.headers);
     return res && res.data;
   }
 
@@ -415,6 +460,7 @@ class APIGateway {
       rows,
     };
     const res = await this.req.post(url, data);
+    this.setResponseHeaders(res && res.headers);
     return (res && res.data) || {};
   }
 
@@ -424,6 +470,7 @@ class APIGateway {
       sql,
     };
     return this.req.post(url, data).then(response => {
+      this.setResponseHeaders(response.headers);
       return Promise.resolve(formatQueryResult(response.data));
     });
   }

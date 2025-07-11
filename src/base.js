@@ -106,6 +106,11 @@ class Base {
     }
   }
 
+  getResponseHeaders(key = '') {
+    if (!this.apiGateway) return null;
+    return this.apiGateway.getResponseHeaders(key);
+  }
+
   getResult(response) {
     const { data, config } = response;
     const { method, url } = config;
