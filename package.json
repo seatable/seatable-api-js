@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/seatable/seatable-api-js#readme",
   "dependencies": {
-    "@babel/runtime": "7.20.13",
+    "@babel/runtime": "7.27.6",
     "axios": "~1.7.*",
     "dayjs": "1.10.7"
   },
