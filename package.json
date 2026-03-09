@@ -1,6 +1,6 @@
 {
   "name": "seatable-api",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "description": "A tool library for accessing seatable base, providing interface services for third-party developers",
   "files": [
     "lib",
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/seatable/seatable-api-js#readme",
   "dependencies": {
+    "@babel/runtime": "7.27.3",
     "axios": "~1.13.*",
     "dayjs": "1.10.7"
   },
@@ -33,7 +34,6 @@
     "@babel/core": "7.15.8",
     "@babel/plugin-transform-runtime": "7.19.6",
     "@babel/preset-env": "7.15.8",
-    "@babel/runtime": "7.27.3",
     "eslint": "8.0.1",
     "jest": "27.2.5"
   }
